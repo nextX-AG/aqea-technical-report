@@ -29,7 +29,46 @@ REPO_ROOT = REPORT_DIR.parent
 ASSETS_DIR = REPORT_DIR / "assets"
 
 FINAL_TRUTH = REPO_ROOT / "docs" / "FINAL_BENCHMARK_TRUTH.md"
-THREESTAGE = REPO_ROOT / "benchmark" / "COMPLETE_3STAGE_RESULTS.md"
+
+
+def sha256_hex(data: bytes) -> str:
+    import hashlib
+
+    h = hashlib.sha256()
+    h.update(data)
+    return h.hexdigest()
+
+
+def find_benchmark_human_scores_artifact(repo_root: Path) -> Path:
+    """
+    Returns the benchmark markdown artifact that contains the section
+    "Models with Human Scores".
+
+    We intentionally avoid encoding internal pipeline framing in filenames
+    or user-facing strings.
+    """
+    bench_dir = repo_root / "benchmark"
+    if not bench_dir.exists():
+        raise FileNotFoundError("benchmark/ directory not found at repo root")
+
+    candidates = sorted(bench_dir.glob("COMPLETE_*_RESULTS.md"))
+    # Fallback to any *.md if naming differs
+    if not candidates:
+        candidates = sorted(bench_dir.glob("*.md"))
+
+    for p in candidates:
+        try:
+            txt = read_text(p)
+        except Exception:
+            continue
+        if re.search(
+            r"^###.*\bModels\s+with\s+Human\s+Scores\b",
+            txt,
+            flags=re.IGNORECASE | re.MULTILINE,
+        ):
+            return p
+
+    raise FileNotFoundError("Could not locate benchmark artifact with 'Models with Human Scores' section")
 
 
 def read_text(path: Path) -> str:
@@ -126,9 +165,14 @@ def extract_generalization_rows(final_truth_md: str) -> List[Dict[str, float]]:
 
 
 def extract_intrinsic_table(final_truth_md: str) -> List[Dict[str, float]]:
-    sec = section_between(final_truth_md, r"2-Stage\s+\(AQEA-Only\)", r"^##\s+")
+    # Extract the intrinsic table from the verified intrinsic section.
+    sec = section_between(
+        final_truth_md,
+        r"Verifizierte\s+Ergebnisse\s+\(Intrinsic\s*-\s*Spearman\s+vs\s+Original\)",
+        r"^##\s+",
+    )
     if not sec:
-        raise ValueError("Could not locate 2-stage intrinsic section in FINAL_BENCHMARK_TRUTH.md")
+        raise ValueError("Could not locate intrinsic section in FINAL_BENCHMARK_TRUTH.md")
     table = extract_markdown_table(sec)
     if not table:
         raise ValueError("Could not locate intrinsic table in FINAL_BENCHMARK_TRUTH.md section")
@@ -147,13 +191,17 @@ def extract_intrinsic_table(final_truth_md: str) -> List[Dict[str, float]]:
     return out
 
 
-def extract_3stage_human_table(three_md: str) -> List[Dict[str, float]]:
-    sec = section_between(three_md, r"Models\s+with\s+Human\s+Scores", r"^###\s+Models\s+WITHOUT")
+def extract_aqea_pq_human_table(three_md: str) -> List[Dict[str, float]]:
+    sec = section_between(
+        three_md,
+        r"Models\s+with\s+Human\s+Scores",
+        r"^###.*\bModels\s+WITHOUT\s+Human\s+Scores\b",
+    )
     if not sec:
-        raise ValueError("Could not locate 3-stage human-scores section")
+        raise ValueError("Could not locate human-scores section in benchmark artifact")
     table = extract_markdown_table(sec)
     if not table:
-        raise ValueError("Could not locate 3-stage human table")
+        raise ValueError("Could not locate human-scores table in benchmark artifact")
     rows = table[2:] if len(table) >= 3 else []
     out: List[Dict[str, float]] = []
     for r in rows:
@@ -164,7 +212,7 @@ def extract_3stage_human_table(three_md: str) -> List[Dict[str, float]]:
         task_pres = parse_percent(r[3])
         out.append({"model": model, "compression_x": compression, "task_preservation_pct": task_pres})
     if not out:
-        raise ValueError("No rows parsed from 3-stage human table")
+        raise ValueError("No rows parsed from human-scores table")
     return out
 
 
@@ -358,22 +406,23 @@ def main() -> int:
     ASSETS_DIR.mkdir(parents=True, exist_ok=True)
 
     final_text = read_text(FINAL_TRUTH)
-    three_text = read_text(THREESTAGE)
+    human_scores_path = find_benchmark_human_scores_artifact(REPO_ROOT)
+    human_scores_text = read_text(human_scores_path)
 
     generalization = extract_generalization_rows(final_text)
     intrinsic = extract_intrinsic_table(final_text)
-    three_stage = extract_3stage_human_table(three_text)
+    aqea_pq_human = extract_aqea_pq_human_table(human_scores_text)
 
     # Figure 1: tradeoff (extrinsic avg, E5-Large)
     (ASSETS_DIR / "figure_tradeoff_extrinsic_e5.svg").write_text(
         figure_tradeoff_extrinsic(generalization), encoding="utf-8"
     )
 
-    # Figure 2: intrinsic retention (2-stage pre-trained)
+    # Figure 2: intrinsic retention (pre-trained weights)
     intr_items = [(d["model"], float(d["spearman_vs_orig"])) for d in intrinsic]
     (ASSETS_DIR / "figure_intrinsic_29x_models.svg").write_text(
         figure_bar_chart(
-            title="Intrinsic retention at ~29× (pre-trained 2-stage)",
+            title="Intrinsic retention at ~29× (pre-trained weights)",
             subtitle="Source: docs/FINAL_BENCHMARK_TRUTH.md (Spearman vs original)",
             items=intr_items,
             y_min=80.0,
@@ -383,12 +432,12 @@ def main() -> int:
         encoding="utf-8",
     )
 
-    # Figure 3: 3-stage task preservation (human labels)
-    three_items = [(d["model"].replace(" (wav2vec2)", ""), float(d["task_preservation_pct"])) for d in three_stage]
+    # Figure 3: task preservation (human labels)
+    three_items = [(d["model"].replace(" (wav2vec2)", ""), float(d["task_preservation_pct"])) for d in aqea_pq_human]
     (ASSETS_DIR / "figure_aqea_pq_task_preservation.svg").write_text(
         figure_bar_chart(
             title="AQEA+PQ task preservation (human labels only)",
-            subtitle="Source: benchmark/COMPLETE_3STAGE_RESULTS.md",
+            subtitle="Source: benchmark artifact (models with human scores)",
             items=three_items,
             y_min=60.0,
             y_max=100.0,
@@ -401,11 +450,11 @@ def main() -> int:
     data = {
         "sources": {
             "final_benchmark_truth": str(FINAL_TRUTH.relative_to(REPO_ROOT)),
-            "complete_3stage_results": str(THREESTAGE.relative_to(REPO_ROOT)),
+            "benchmark_human_scores_sha256": sha256_hex(human_scores_text.encode("utf-8")),
         },
         "generalization_rows": generalization,
         "intrinsic_rows": intrinsic,
-        "three_stage_human_rows": three_stage,
+        "aqea_pq_human_rows": aqea_pq_human,
     }
     (ASSETS_DIR / "figures_data.json").write_text(json.dumps(data, indent=2), encoding="utf-8")
 

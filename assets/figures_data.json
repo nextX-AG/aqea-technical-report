@@ -1,7 +1,7 @@
 {
   "sources": {
     "final_benchmark_truth": "docs/FINAL_BENCHMARK_TRUTH.md",
-    "complete_3stage_results": "benchmark/COMPLETE_3STAGE_RESULTS.md"
+    "benchmark_human_scores_sha256": "c892f4b2c8b101c6740d89b53197c17eb7a0060b0aae69f451ec3e8ed5579984"
   },
   "generalization_rows": [
     {
@@ -68,7 +68,7 @@
       "spearman_vs_orig": 93.8
     }
   ],
-  "three_stage_human_rows": [
+  "aqea_pq_human_rows": [
     {
       "model": "E5-Large 1024D",
       "compression_x": 241.0,
