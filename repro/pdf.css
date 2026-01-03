@@ -1,0 +1,131 @@
+/* AQEA Technical Report PDF styling (md-to-pdf / Puppeteer).
+   Keep this deterministic: no external font downloads. */
+
+:root {
+  --fg: #0b1220;
+  --muted: #4b5563;
+  --link: #0ea5e9;
+  --border: #e5e7eb;
+  --code-bg: #f8fafc;
+  --code-fg: #0b1220;
+}
+
+html, body {
+  color: var(--fg);
+  font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, "Noto Sans", "Liberation Sans", sans-serif;
+  font-size: 12.5px;
+  line-height: 1.55;
+}
+
+/* Title block */
+h1 {
+  font-size: 26px;
+  letter-spacing: -0.02em;
+  margin-top: 0.4em;
+  margin-bottom: 0.25em;
+}
+
+h2 {
+  font-size: 18px;
+  margin-top: 1.6em;
+  padding-top: 0.2em;
+  border-top: 0.5px solid var(--border);
+}
+
+h3 {
+  font-size: 14px;
+  margin-top: 1.2em;
+}
+
+p, ul, ol {
+  margin-top: 0.55em;
+  margin-bottom: 0.55em;
+}
+
+code, pre, kbd, samp {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+}
+
+pre {
+  background: var(--code-bg);
+  color: var(--code-fg);
+  padding: 10px 12px;
+  border-radius: 6px;
+  border: 0.5px solid var(--border);
+  overflow: auto;
+  font-size: 11px;
+  line-height: 1.45;
+}
+
+code {
+  background: rgba(229, 231, 235, 0.6);
+  padding: 0.08em 0.22em;
+  border-radius: 4px;
+}
+
+pre code {
+  background: transparent !important;
+  padding: 0;
+}
+
+/* md-to-pdf / highlight.js sometimes applies its own white background */
+pre code.hljs,
+pre .hljs {
+  background: transparent !important;
+  color: var(--code-fg) !important;
+}
+
+a {
+  color: var(--link);
+  text-decoration: none;
+}
+
+hr {
+  border: 0;
+  border-top: 1px solid var(--border);
+  margin: 1.4em 0;
+}
+
+table {
+  border-collapse: collapse;
+  width: 100%;
+  margin: 0.8em 0 1.0em;
+  font-size: 11.5px;
+}
+
+th, td {
+  border: 0.5px solid var(--border);
+  padding: 7px 8px;
+  vertical-align: top;
+}
+
+th {
+  background: #f8fafc;
+  font-weight: 600;
+}
+
+blockquote {
+  margin: 0.9em 0;
+  padding: 0.6em 0.9em;
+  border-left: 3px solid var(--border);
+  color: var(--muted);
+  background: #fafafa;
+}
+
+img {
+  max-width: 100%;
+}
+
+/* Avoid ugly breaks in headings and figures */
+h2, h3, figure, img {
+  break-after: avoid;
+  page-break-after: avoid;
+}
+
+/* Simple “caption” look for the line after an image */
+img + p {
+  color: var(--muted);
+  font-size: 11px;
+  margin-top: 0.35em;
+}
+

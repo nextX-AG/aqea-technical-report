@@ -1,0 +1,7 @@
+# Build outputs
+dist/
+*.pdf
+
+# Local packaging outputs
+hf_package/
+

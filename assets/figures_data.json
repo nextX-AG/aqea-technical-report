@@ -1,0 +1,98 @@
+{
+  "sources": {
+    "final_benchmark_truth": "docs/FINAL_BENCHMARK_TRUTH.md",
+    "complete_3stage_results": "benchmark/COMPLETE_3STAGE_RESULTS.md"
+  },
+  "generalization_rows": [
+    {
+      "dataset": "STSB",
+      "original": 84.5,
+      "aqea_29x": 81.0,
+      "aqea_29x_pq_117x": 81.1
+    },
+    {
+      "dataset": "STS12",
+      "original": 77.0,
+      "aqea_29x": 71.8,
+      "aqea_29x_pq_117x": 71.8
+    },
+    {
+      "dataset": "STS13",
+      "original": 84.1,
+      "aqea_29x": 79.5,
+      "aqea_29x_pq_117x": 79.4
+    },
+    {
+      "dataset": "STS14",
+      "original": 80.5,
+      "aqea_29x": 75.6,
+      "aqea_29x_pq_117x": 75.6
+    },
+    {
+      "dataset": "STS15",
+      "original": 89.8,
+      "aqea_29x": 83.7,
+      "aqea_29x_pq_117x": 83.7
+    },
+    {
+      "dataset": "STS16",
+      "original": 85.5,
+      "aqea_29x": 80.8,
+      "aqea_29x_pq_117x": 80.8
+    }
+  ],
+  "intrinsic_rows": [
+    {
+      "model": "MiniLM",
+      "compression": "**30x**",
+      "spearman_vs_orig": 88.8
+    },
+    {
+      "model": "MPNet",
+      "compression": "**30x**",
+      "spearman_vs_orig": 94.7
+    },
+    {
+      "model": "E5-Large",
+      "compression": "**29x**",
+      "spearman_vs_orig": 94.9
+    },
+    {
+      "model": "Audio",
+      "compression": "**30x**",
+      "spearman_vs_orig": 97.1
+    },
+    {
+      "model": "Protein",
+      "compression": "**29x**",
+      "spearman_vs_orig": 93.8
+    }
+  ],
+  "three_stage_human_rows": [
+    {
+      "model": "E5-Large 1024D",
+      "compression_x": 241.0,
+      "task_preservation_pct": 94.1
+    },
+    {
+      "model": "wav2vec2 768D",
+      "compression_x": 236.0,
+      "task_preservation_pct": 94.9
+    },
+    {
+      "model": "MPNet 768D",
+      "compression_x": 236.0,
+      "task_preservation_pct": 92.2
+    },
+    {
+      "model": "Mistral 1024D",
+      "compression_x": 241.0,
+      "task_preservation_pct": 89.8
+    },
+    {
+      "model": "MiniLM 384D",
+      "compression_x": 219.0,
+      "task_preservation_pct": 67.9
+    }
+  ]
+}
