@@ -3,6 +3,7 @@ title: "AQEA: Technical Report — Domain-Adaptive Semantic Compression of Embed
 status: "draft"
 version: "0.1"
 last_updated: "2026-01-03"
+doi: "10.5281/zenodo.18138436"
 ---
 
 # AQEA: Technical Report — Domain-Adaptive Semantic Compression of Embeddings
@@ -17,7 +18,8 @@ last_updated: "2026-01-03"
 ```text
 Karim, Sayed Amir (NextX AG).
 "AQEA: Technical Report — Domain-Adaptive Semantic Compression of Embeddings."
-Version 0.1, 2026-01-03. Source: aqea-compress commit c0ea33f.
+Version 0.1, 2026-01-03. DOI: 10.5281/zenodo.18138436 (https://doi.org/10.5281/zenodo.18138436).
+Reproducibility source: aqea-compress commit f093b2d.
 ```
 
 ## Abstract
