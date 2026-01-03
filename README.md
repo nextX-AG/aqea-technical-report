@@ -64,6 +64,21 @@ If you see a Chromium error like **"No usable sandbox"**, the PDF build already 
 pandoc TECHNICAL_REPORT.md -o AQEA_Technical_Report.pdf
 ```
 
+## Related Repositories
+
+| Repository | Description |
+|------------|-------------|
+| [aqea-cli](https://github.com/nextX-AG/aqea-cli) | Command-line tool for AQEA compression |
+| [aqea-compress](https://github.com/nextX-AG/aqea-compress) | Main codebase (API, platform, training) |
+
+## Links
+
+- 🌐 [Website](https://aqea.ai)
+- 🎮 [Live Demo](https://demo.aqea.ai)
+- 🚀 [Platform](https://platform.aqea.ai)
+- 📖 [Documentation](https://aqea.ai/docs)
+- 🤗 [HuggingFace Dataset](https://huggingface.co/datasets/nextxag/aqea-sts-verification-pairs)
+
 ## Security
 
 - Never commit API keys.
